@@ -1,0 +1,37 @@
+# Optional PyTorch path: train the same patch CNN in PyTorch, export ONNX and evaluate it through
+# ONNX Runtime with the same detector. Not part of the main CI gate.
+name: PyTorch → ONNX
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  onnx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip install "torch==2.5.1" "onnx==1.17.0" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+      - name: Benchmark + patch dataset (the NumPy model trains here too)
+        run: |
+          python -m pixelproof generate
+          python -m pixelproof train
+      - name: Train in PyTorch and export ONNX
+        run: python tools/train_torch.py --patches data/patches.npz --out models/patch_cnn.onnx
+      - name: Refit fusion/thresholds on ONNX heatmaps and evaluate
+        run: |
+          python -m pixelproof train --patch-model onnx:models/patch_cnn.onnx --models models_onnx --export-patches ""
+          python -m pixelproof evaluate --models models_onnx --patch-model onnx:models/patch_cnn.onnx --out data/eval_onnx
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onnx-evaluation
+          path: |
+            models/patch_cnn.onnx
+            data/eval_onnx/metrics.json

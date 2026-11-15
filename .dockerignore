@@ -1,0 +1,8 @@
+.git
+.venv
+data
+docs
+models_onnx
+**/__pycache__
+.pytest_cache
+.ruff_cache

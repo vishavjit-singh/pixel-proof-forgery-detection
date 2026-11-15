@@ -1,0 +1,18 @@
+[project]
+name = "pixel-proof-forgery-detection"
+version = "1.0.0"
+description = "Image tampering detection and localisation with Error Level Analysis, noise residuals and a patch CNN."
+authors = [{ name = "Vishavjit Singh Saini" }]
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]

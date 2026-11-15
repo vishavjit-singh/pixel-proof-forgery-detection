@@ -1,0 +1,45 @@
+# Synthetic tampering benchmark + model settings. Everything is generated from this file and the seed.
+seed: 10
+image_size: 256
+
+# Base images per split. Each base image yields one authentic and one tampered sample.
+base_images:
+  train: 200
+  val: 100
+  test: 120
+
+# Source photos (scikit-image sample images that contain no people) are split by source,
+# so no test image shares a source photo with training. Procedural scenes use disjoint seeds.
+sources:
+  train: [brick, chelsea, cell, grass, hubble_deep_field, immunohistochemistry, retina]
+  val: [clock, coins]
+  test: [coffee, gravel, moon, rocket]
+  photo_share: 0.5              # the rest are procedurally generated scenes
+
+manipulations: [splice, copy_move, retouch, resample]
+
+jpeg:
+  first_quality: [70, 95]       # "camera" compression
+  final_quality: [75, 95]       # re-save after editing (or platform recompression for authentic images)
+  donor_quality: [60, 95]       # splice donors carry their own compression history
+
+sensor_noise_sigma: [1.0, 4.0]  # simulated sensor noise added before the first compression
+region_area: [0.04, 0.14]       # tampered area as a share of the image
+
+features:
+  ela_quality: 90
+  block: 32                     # grid for the image-level statistics
+
+patch:
+  size: 32
+  stride: 16
+  positive_min_overlap: 0.5     # patch labelled tampered if ≥ 50% of its pixels are in the mask
+  negative_max_overlap: 0.0
+  negatives_per_authentic: 24
+  negatives_per_tampered: 8
+
+cnn:
+  epochs: 12
+  batch_size: 64
+  learning_rate: 0.002
+  seed: 10
