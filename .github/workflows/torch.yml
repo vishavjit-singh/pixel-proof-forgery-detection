@@ -11,6 +11,8 @@ jobs:
   onnx:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      PYTHONPATH: src   # the package lives in src/ (the Makefile sets this for the main CI)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
